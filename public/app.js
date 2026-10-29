@@ -4,7 +4,7 @@ import {hostState,voiceState,avatarRect,drawPNG,initHostControls,showEngine} fro
 const $=id=>document.getElementById(id);
 const boot=await fetch('/api/bootstrap').then(r=>r.json());
 const token=boot.token,canvas=$('stage'),ctx=canvas.getContext('2d');
-let scene='game',screen=null,camera=null,mic=null,audioContext,destination,gameGain,micGain,aiGain,analyser,voiceSource,voiceResolve;
+let scene='game',screen=null,camera=null,mic=null,audioContext,destination,gameGain,micGain,aiGain,monitorGain,analyser,voiceSource,voiceResolve;
 let screenVideo=document.createElement('video'),camVideo=document.createElement('video');
 for(const v of [screenVideo,camVideo]){v.muted=true;v.playsInline=true;}
 let recorder=null,localRecorder=null,socket=null,output=null,recordChunks=[],startAt=0,queue=[],busy=false,paused=false,generation=0,lastReply=0,responseCount=0,chatConnected=false,selected=null,avatarLevel=0;
@@ -12,10 +12,12 @@ let toastTimer,streamPlatform=boot.state.platform||'youtube',settingsPlatform=st
 function toast(s){$('toast').textContent=s;$('toast').style.display='block';clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').style.display='none',6500);}
 async function api(path,body){const r=await fetch('/api/'+path,{method:body===undefined?'GET':'POST',headers:{'x-studio-token':token,'Content-Type':'application/json'},...(body===undefined?{}:{body:JSON.stringify(body)})});const d=await r.json();if(!r.ok)throw Error(d.error||'Request failed');return d;}
 function bind(id,fn){$(id).addEventListener('click',async()=>{try{await fn();}catch(e){toast(e.message);}});}
+try{$('aiMonitor').checked=localStorage.getItem('nara-ai-monitor')!=='false';}catch{}
+$('aiMonitor').onchange=()=>{if(monitorGain)monitorGain.gain.value=$('aiMonitor').checked?1:0;try{localStorage.setItem('nara-ai-monitor',String($('aiMonitor').checked));}catch{}};
 async function initAudio(){
  if(audioContext){await audioContext.resume();return;}
- audioContext=new AudioContext();destination=audioContext.createMediaStreamDestination();gameGain=audioContext.createGain();micGain=audioContext.createGain();aiGain=audioContext.createGain();analyser=audioContext.createAnalyser();analyser.fftSize=256;
- gameGain.connect(destination);micGain.connect(destination);aiGain.connect(analyser);analyser.connect(destination);aiGain.connect(audioContext.destination);
+ audioContext=new AudioContext();destination=audioContext.createMediaStreamDestination();gameGain=audioContext.createGain();micGain=audioContext.createGain();aiGain=audioContext.createGain();monitorGain=audioContext.createGain();monitorGain.gain.value=$('aiMonitor').checked?1:0;analyser=audioContext.createAnalyser();analyser.fftSize=256;
+ gameGain.connect(destination);micGain.connect(destination);aiGain.connect(analyser);analyser.connect(destination);aiGain.connect(monitorGain);monitorGain.connect(audioContext.destination);
  // A silent track keeps the outgoing media format stable even before a mic is enabled.
  const osc=audioContext.createOscillator(),silent=audioContext.createGain();silent.gain.value=0;osc.connect(silent).connect(destination);osc.start();
  for(const [id,gain] of [['gameVolume',gameGain],['micVolume',micGain],['aiVolume',aiGain]]){gain.gain.value=Number($(id).value);$(id).oninput=()=>gain.gain.value=Number($(id).value);}
@@ -53,7 +55,7 @@ function draw(t){
  round(25,674,1230,30,8,'#0b101ace');text('NARA  /  AI CO-HOST',40,695,12,'#c8b7f2',650);text('AI voice & avatar',1080,695,12,'#a9b6cc');
  requestAnimationFrame(draw);
 }requestAnimationFrame(draw);
-bind('captureBtn',async()=>{await initAudio();const s=await navigator.mediaDevices.getDisplayMedia({video:{frameRate:30,width:1280,height:720},audio:true});screen?.getTracks().forEach(t=>t.stop());screen=s;screenVideo.srcObject=s;await screenVideo.play();if(s.getAudioTracks().length)audioContext.createMediaStreamSource(s).connect(gameGain);$('screenStatus').textContent=s.getVideoTracks()[0].label+(s.getAudioTracks().length?' · audio enabled':' · no audio');s.getVideoTracks()[0].onended=()=>{if(screen===s){screen=null;$('screenStatus').textContent='Capture stopped';if(recorder)stopStream();}};});
+bind('captureBtn',async()=>{await initAudio();const s=await navigator.mediaDevices.getDisplayMedia({video:{frameRate:30,width:1280,height:720},audio:true,systemAudio:'exclude',selfBrowserSurface:'exclude'});screen?.getTracks().forEach(t=>t.stop());screen=s;screenVideo.srcObject=s;await screenVideo.play();if(s.getAudioTracks().length)audioContext.createMediaStreamSource(s).connect(gameGain);$('screenStatus').textContent=s.getVideoTracks()[0].label+(s.getAudioTracks().length?' · audio enabled':' · no audio');s.getVideoTracks()[0].onended=()=>{if(screen===s){screen=null;$('screenStatus').textContent='Capture stopped';if(recorder)stopStream();}};});
 bind('cameraBtn',async()=>{if(camera){camera.getTracks().forEach(t=>t.stop());camera=null;$('cameraBtn').textContent='Enable';$('camStatus').textContent='Inactive';return;}camera=await navigator.mediaDevices.getUserMedia({video:{width:640,height:480},audio:false});camVideo.srcObject=camera;await camVideo.play();$('cameraBtn').textContent='Disable';$('camStatus').textContent='Active';});
 bind('micBtn',async()=>{await initAudio();if(mic){mic.getTracks().forEach(t=>t.stop());mic=null;$('micBtn').textContent='Enable mic';return;}mic=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true},video:false});audioContext.createMediaStreamSource(mic).connect(micGain);$('micBtn').textContent='Disable mic';});
 for(const b of document.querySelectorAll('[data-scene]'))b.onclick=()=>{scene=b.dataset.scene;document.querySelectorAll('[data-scene]').forEach(x=>x.classList.toggle('selected',x===b));};
