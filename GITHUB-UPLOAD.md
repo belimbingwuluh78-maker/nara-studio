@@ -1,30 +1,36 @@
-# Unggah Nara Studio ke GitHub
+# Working with the GitHub repository
 
-Paket ini sudah disiapkan sebagai source repository. Belum ada repository dibuat atau file diunggah ke akun GitHub.
+The public source repository is [belimbingwuluh78-maker/nara-studio](https://github.com/belimbingwuluh78-maker/nara-studio).
 
-## Lewat website
-
-1. Ekstrak ZIP lalu buka folder `Nara-Studio`.
-2. Di GitHub, buat repository baru dengan nama misalnya `nara-studio`. Tentukan Public atau Private sesuai pilihanmu. Jangan tambahkan README, license atau .gitignore otomatis karena semua sudah ada dalam paket.
-3. Pada repository kosong, pilih **uploading an existing file** / **Upload files**.
-4. Unggah seluruh ISI folder `Nara-Studio`, bukan ZIP-nya dan bukan folder pembungkusnya. `README.md`, `package.json`, `public/` dan `.github/` harus berada langsung di root repository.
-5. Pastikan file bertitik ikut terbawa: `.github/`, `.gitignore`, `.gitattributes`, dan `.env.example`.
-6. Commit perubahan. Buka tab **Actions** untuk melihat hasil pemeriksaan setelah workflow berjalan.
-
-## Lewat Git
-
-Jalankan dari folder `Nara-Studio`. Ganti `USERNAME` dan nama repository sesuai akunmu:
+## Get the source
 
 ```powershell
-git init
-git branch -M main
-git add .
-git status --short
-git commit -m "Initial Nara Studio alpha"
-git remote add origin https://github.com/USERNAME/nara-studio.git
-git push -u origin main
+git clone https://github.com/belimbingwuluh78-maker/nara-studio.git
+cd nara-studio
+npm ci
+npm start
 ```
 
-Gunakan login GitHub/Git Credential Manager ketika diminta; jangan menaruh token dalam perintah atau file source. Untuk repository yang sudah berisi commit, gunakan clone/branch dan gabungkan perubahan, jangan force-push panduan ini.
+See [README.md](README.md) for requirements, setup, features, and current limitations.
 
-GitHub menyimpan source. Aplikasi ini tidak bisa dijalankan lewat GitHub Pages karena membutuhkan server Node.js, FFmpeg, dan browser/model lokal.
+## Publish updates
+
+Work in a clone of the repository. Review changes before committing:
+
+```powershell
+git status --short
+git diff
+npm run check
+npm test
+git add <reviewed-files>
+git commit -m "Describe the change in English"
+git push origin main
+```
+
+Use GitHub sign-in or Git Credential Manager when prompted. Do not place access tokens in commands or source files. Contributors should use a branch and pull request as described in [CONTRIBUTING.md](CONTRIBUTING.md).
+
+Keep credentials, stream keys, recordings, voice references, model weights, and generated folders out of commits. The repository includes `.gitignore` rules and an empty `.env.example` for configuration guidance.
+
+Open the **Actions** tab to check the Windows workflow after pushing a change.
+
+GitHub hosts the source code. This application cannot run on GitHub Pages: it requires a local Node.js server, FFmpeg, and optional local browser/model processes.
