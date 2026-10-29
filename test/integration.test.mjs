@@ -26,7 +26,9 @@ test('server protects mutations, isolates streaming platforms and generates loca
  await new Promise((resolve,reject)=>{const timer=setTimeout(()=>reject(Error('Server startup timeout')),10000);proc.stdout.once('data',()=>{clearTimeout(timer);resolve();});proc.once('error',reject);});
  const base='http://localhost:3219';const boot=await fetch(base+'/api/bootstrap').then(r=>r.json());
  assert.equal((await fetch(base+'/api/config',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'})).status,403);
- const post=(path,body)=>fetch(base+'/api/'+path,{method:'POST',headers:{'x-studio-token':boot.token,'Content-Type':'application/json'},body:JSON.stringify(body)});
+ assert.equal((await fetch('http://127.0.0.1:3219/')).status,403);
+ assert.equal((await fetch('http://127.0.0.1:3219/api/bootstrap')).status,403);
+ const post=(path,body)=>fetch(base+'/api/'+path,{method:'POST',headers:{'x-studio-token':boot.token,'Content-Type':'application/json',Origin:base},body:JSON.stringify(body)});
  assert.equal((await post('ai/reply',{text:'hi'})).status,400);
  const auth=await post('youtube/auth',{});assert.equal(auth.status,503);assert.equal((await auth.json()).code,'GOOGLE_LOGIN_NOT_CONFIGURED');
  const status=await fetch(base+'/api/status',{headers:{'x-studio-token':boot.token}}).then(r=>r.json());assert.equal(status.googleLoginConfigured,false);assert.equal(status.clientSecret,undefined);
@@ -87,7 +89,7 @@ test('server protects mutations, isolates streaming platforms and generates loca
   }finally{const closed=once(ws,'close');ws.close();await closed;}
  });
  if(process.platform==='win32'){
- const voice=await post('voice',{text:'Hello, I am Nara.'});const buf=Buffer.from(await voice.arrayBuffer());assert.equal(voice.status,200,buf.toString());assert.equal(buf.subarray(0,4).toString(),'RIFF');assert.ok(buf.length>1000);
+ const voice=await post('voice',{text:'Hello, café — “Nara” 😀.'});const buf=Buffer.from(await voice.arrayBuffer());assert.equal(voice.status,200,buf.toString());assert.equal(buf.subarray(0,4).toString(),'RIFF');assert.ok(buf.length>1000);
  }
  }finally{proc.kill();await rm(data,{recursive:true,force:true});}
 });
