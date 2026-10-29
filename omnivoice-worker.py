@@ -25,12 +25,12 @@ def load(target):
     global model, device
     if model is not None and device == target:
         return
-    emit({'type': 'phase', 'message': 'Memuat model OmniVoice; unduhan awal dapat memerlukan beberapa menit.'})
+    emit({'type': 'phase', 'message': 'Loading the OmniVoice model; the first download may take several minutes.'})
     import torch
     from omnivoice import OmniVoice
     torch.set_num_threads(min(6, os.cpu_count() or 4))
     if target == 'cuda' and not torch.cuda.is_available():
-        raise ValueError('GPU CUDA tidak tersedia. Pilih CPU.')
+        raise ValueError('A CUDA GPU is unavailable. Select CPU.')
     if model is not None:
         del model
         model = None
@@ -44,7 +44,7 @@ def load(target):
     )
     model.eval()
     device = target
-    emit({'type': 'phase', 'message': 'OmniVoice siap di ' + target.upper()})
+    emit({'type': 'phase', 'message': 'OmniVoice ready on ' + target.upper()})
 
 emit({'type': 'ready'})
 for line in sys.stdin:
@@ -57,18 +57,18 @@ for line in sys.stdin:
                 audio = None
             else:
                 import soundfile as sf
-                kwargs = dict(text=request['text'][:1200], language=request.get('language', 'id'),
+                kwargs = dict(text=request['text'][:1200], language=request.get('language', 'en'),
                               speed=float(request.get('speed', 1)), num_step=int(request.get('steps', 16)))
                 if request.get('mode') == 'clone':
                     # Only a fixed, server-owned reference file may be read.
                     ref = Path(os.environ.get('STUDIO_DATA_DIR', str(ROOT / 'data'))) / 'voice-reference.wav'
                     if not ref.exists() or not request.get('refText', '').strip():
-                        raise ValueError('Unggah rekaman referensi dan isi transkripsinya.')
+                        raise ValueError('Upload a voice reference and enter its transcript.')
                     samples, rate = sf.read(ref, dtype='float32')
                     if samples.ndim > 1:
                         samples = samples.mean(axis=1)
                     if not 1 <= len(samples) / rate <= 30.1:
-                        raise ValueError('Referensi suara harus berdurasi 1–30 detik.')
+                        raise ValueError('The voice reference must be 1–30 seconds long.')
                     import torch
                     kwargs.update(ref_audio=(torch.from_numpy(samples).unsqueeze(0), rate), ref_text=request['refText'][:2000])
                 elif request.get('mode') == 'design':
@@ -83,5 +83,5 @@ for line in sys.stdin:
     except Exception as exc:
         message = str(exc)
         if 'out of memory' in message.lower():
-            message = 'VRAM tidak cukup. Lepaskan model lalu pilih CPU, atau tutup aplikasi GPU lain.'
+            message = 'Not enough VRAM. Unload the model and select CPU, or close other GPU applications.'
         emit({'type': 'error', 'id': request.get('id'), 'error': message[:700]})

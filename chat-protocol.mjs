@@ -3,7 +3,7 @@ import {createHash} from 'node:crypto';
 export function chatChannel(platform,value){
  const channel=String(value||'').trim().replace(/^[@#]/,'').toLowerCase();
  const valid=platform==='twitch'?/^[a-z0-9_]{1,25}$/:platform==='tiktok'?/^[a-z0-9_.]{1,24}$/:null;
- if(!valid||!valid.test(channel))throw Error('Masukkan username '+(platform==='twitch'?'Twitch':'TikTok')+' saja, tanpa URL atau spasi.');
+ if(!valid||!valid.test(channel))throw Error('Enter the '+(platform==='twitch'?'Twitch':'TikTok')+' username only, without a URL or spaces.');
  return channel;
 }
 const unescapeTag=s=>s.replace(/\\([s:nr\\])/g,(_,c)=>({s:' ',':':';',n:'\n',r:'\r','\\':'\\'}[c]));
@@ -30,7 +30,7 @@ export function normalizeComment(platform,channel,row,startedAt=0){
 }
 export function chatFailure(platform,error){
  const name=String(error?.name||''),s=String(error?.message||error||'');
- if(platform==='tiktok')return 'Pembaca chat TikTok berhenti. Periksa jendela browser, status LIVE dan internet, lalu hubungkan kembali.';
- return 'Chat Twitch terputus atau koneksi baca-saja ditolak. Periksa channel dan internet, lalu hubungkan lagi.';
+ if(platform==='tiktok')return 'The TikTok chat reader stopped. Check the browser window, LIVE status, and internet connection, then reconnect.';
+ return 'Twitch chat disconnected or the read-only connection was rejected. Check the channel and internet connection, then reconnect.';
 }
 

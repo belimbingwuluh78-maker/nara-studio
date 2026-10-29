@@ -9,4 +9,4 @@ uv pip install --python .venv/Scripts/python.exe torch==2.8.0 torchaudio==2.8.0 
 if ($LASTEXITCODE) { throw 'PyTorch installation failed.' }
 uv pip install --python .venv/Scripts/python.exe -r requirements-omnivoice.txt
 if ($LASTEXITCODE) { throw 'OmniVoice installation failed.' }
-Write-Host 'OmniVoice installed. Open Avatar & suara in the studio and click Muat OmniVoice.'
+Write-Host 'OmniVoice installed. Open Avatar & voice in the studio and click Load OmniVoice.'

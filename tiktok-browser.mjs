@@ -1,10 +1,10 @@
 import {readTikTokPage} from './tiktok-dom.mjs';
 import {chatChannel} from './chat-protocol.mjs';
 const messages={
- location:'Buka kembali halaman LIVE akun ini di jendela pembaca TikTok. Pembacaan dijeda selama halaman berbeda.',
- captcha:'TikTok meminta verifikasi. Selesaikan CAPTCHA sendiri di jendela TikTok; pembacaan lanjut otomatis.',
- login:'TikTok meminta login. Masuk sendiri di jendela TikTok; pembacaan lanjut otomatis.',
- comments:'Browser terbuka. Menunggu komentar yang dapat dikenali. Pastikan akun sedang LIVE dan panel chat terlihat.'
+ location:'Reopen this account\'s LIVE page in the TikTok reader window. Reading is paused while on another page.',
+ captcha:'TikTok requires verification. Complete the CAPTCHA yourself in the TikTok window; reading will resume automatically.',
+ login:'TikTok requires sign-in. Sign in yourself in the TikTok window; reading will resume automatically.',
+ comments:'Browser open. Waiting for recognizable comments. Make sure the account is LIVE and the chat panel is visible.'
 };
 export function createTikTokBrowserReader(channel,send,{loadChromium=async()=> (await import('playwright-core')).chromium,intervalMs=700}={}){
  channel=chatChannel('tiktok',channel);
@@ -18,34 +18,34 @@ export function createTikTokBrowserReader(channel,send,{loadChromium=async()=> (
    if(closed)return;
    try{launching=chromium.launch({channel,headless:false,timeout:20000,args:['--mute-audio']});browser=await launching;break;}catch{}finally{launching=null;}
   }
-  if(!browser){emit({type:'error',message:'Browser pembaca tidak dapat dibuka. Pastikan Microsoft Edge atau Google Chrome terpasang dan diizinkan berjalan.'});return;}
+  if(!browser){emit({type:'error',message:'The reader browser could not open. Make sure Microsoft Edge or Google Chrome is installed and allowed to run.'});return;}
   if(closed){await browser.close();return;}
-  browser.on('disconnected',()=>{if(!closed){emit({type:'error',message:'Jendela TikTok ditutup. Klik Hubungkan chat untuk membuka kembali.'});void close();}});
+  browser.on('disconnected',()=>{if(!closed){emit({type:'error',message:'The TikTok window was closed. Click Connect chat to reopen it.'});void close();}});
   const context=await browser.newContext({viewport:{width:1100,height:800},acceptDownloads:false});
   page=await context.newPage();
-  page.on('close',()=>{if(!closed){emit({type:'error',message:'Tab pembaca TikTok ditutup. Hubungkan chat kembali.'});void close();}});
-  status('waiting','Jendela TikTok dibuka. Jika diminta, selesaikan login atau CAPTCHA sendiri di browser.');
+  page.on('close',()=>{if(!closed){emit({type:'error',message:'The TikTok reader tab was closed. Reconnect chat.'});void close();}});
+  status('waiting','TikTok window opened. If prompted, complete sign-in or the CAPTCHA yourself in the browser.');
   try{await page.goto(`https://www.tiktok.com/@${channel}/live`,{waitUntil:'domcontentloaded',timeout:45000});}
-  catch{if(closed)return;status('waiting','Halaman TikTok belum termuat. Periksa internet lalu muat ulang halaman di jendela TikTok.');}
+  catch{if(closed)return;status('waiting','The TikTok page has not loaded. Check your internet connection, then reload the page in the TikTok window.');}
   if(closed)return;
   const poll=async()=>{
    if(closed||polling)return;polling=true;
    try{
     const snapshot=await page.evaluate(readTikTokPage,channel);
     if(closed)return;
-    if(snapshot.status==='ended'){status('ended','LIVE TikTok telah berakhir atau akun belum LIVE.');await close();return;}
+    if(snapshot.status==='ended'){status('ended','TikTok LIVE has ended or the account is not LIVE yet.');await close();return;}
     if(snapshot.status==='connected'){
-     ready=true;emptySince=0;status('connected','Membaca chat @'+channel+' lewat browser lokal');
+     ready=true;emptySince=0;status('connected','Reading chat @'+channel+' through the local browser');
      for(const row of snapshot.rows)emit({type:'comment',row});
     }else{
      // An empty chat after verified connection is normal. Navigation/login still pauses it.
      if(ready&&snapshot.reason==='comments'){emptySince||=Date.now();if(Date.now()-emptySince<10000)return;}
      ready=false;status('waiting',messages[snapshot.reason]||messages.comments);
     }
-   }catch{if(!closed){ready=false;status('waiting','Halaman sedang berubah. Tunggu TikTok selesai dimuat atau muat ulang halaman.');}}
+   }catch{if(!closed){ready=false;status('waiting','The page is changing. Wait for TikTok to load or reload the page.');}}
    finally{polling=false;}
   };
   timer=setInterval(()=>void poll(),intervalMs);await poll();
- })().catch(async()=>{emit({type:'error',message:'Pembaca browser TikTok gagal dijalankan. Tutup koneksi lalu coba lagi.'});await close();});
+ })().catch(async()=>{emit({type:'error',message:'The TikTok browser reader failed to start. Disconnect and try again.'});await close();});
  return {close,start};
 }

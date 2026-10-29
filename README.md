@@ -32,12 +32,12 @@ npm start
 Open **http://localhost:3210**. On Windows, you can also run `start-studio.cmd`. The first installation downloads dependencies and FFmpeg. Keep the server terminal open while using the studio.
 
 1. Select a game/window and configure your avatar and audio.
-2. Open **Pengaturan** (Settings), enter your AI API key, and choose a model and persona.
-3. Select a platform and click **Hubungkan chat** (Connect chat).
-4. Enable **Balas otomatis** (Automatic replies) after chat and voice are ready.
+2. Open **Settings**, enter your AI API key, and choose a model and persona.
+3. Select a platform and click **Connect chat**.
+4. Enable **Auto-reply** after chat and voice are ready.
 5. Configure the platform's server URL and stream key when you want to send video/audio. Connecting chat alone does not start a broadcast.
 
-The current application interface is primarily in Indonesian. See the [detailed Indonesian user guide](docs/USER-GUIDE.md) for additional setup instructions.
+The interface, setup guides, and built-in messages are in English. The default AI persona and voice language are English. You can change the persona and OmniVoice language in Settings and Avatar & voice; existing saved voice preferences are preserved. See the [detailed user guide](docs/USER-GUIDE.md) for additional setup instructions.
 
 ## TikTok local browser reader
 
@@ -53,7 +53,7 @@ Windows speech is available without downloading an AI voice model. For OmniVoice
 
 1. Install [uv](https://docs.astral.sh/uv/getting-started/installation/).
 2. Run `setup-omnivoice.ps1` from PowerShell.
-3. Open **Avatar & suara** (Avatar & voice), select OmniVoice, and load the model.
+3. Open **Avatar & voice**, select OmniVoice, and load the model.
 
 Python, PyTorch, and model downloads require several GB of storage. CPU/GPU resource requirements depend on the selected settings and concurrent game workload. Model weights and runtimes are not included in this repository.
 
@@ -67,7 +67,7 @@ Create a Google Cloud project, enable YouTube Data API v3, configure OAuth conse
 http://localhost:3210/oauth/callback
 ```
 
-Import the downloaded client JSON through **Aktivasi Google** (Google activation) in the studio. Never commit real OAuth credentials, tokens, API keys, cookies, or stream keys.
+Import the downloaded client JSON through **Google setup** in the studio. Never commit real OAuth credentials, tokens, API keys, cookies, or stream keys.
 
 ## Development and testing
 

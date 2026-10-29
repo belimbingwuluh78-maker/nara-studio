@@ -11,11 +11,11 @@ export function modelOptions(provider,model) {
 }
 export function ingestUrl(server, key) {
   const url = new URL(server);
-  if (!['rtmp:','rtmps:'].includes(url.protocol) || !url.hostname || url.username || url.password || url.search || url.hash || !key || /[\s#]/.test(key)) throw Error('Server harus berupa URL RTMP(S) tanpa query. Masukkan stream key lengkap, termasuk parameter jika ada, pada kolom stream key.');
+  if (!['rtmp:','rtmps:'].includes(url.protocol) || !url.hostname || url.username || url.password || url.search || url.hash || !key || /[\s#]/.test(key)) throw Error('The server must be an RTMP(S) URL without a query. Enter the full stream key, including any parameters, in the stream key field.');
   return server.replace(/\/$/,'')+'/'+key;
 }
 export function encoderArgs(target, encoder='libx264') {
-  if (!['libx264','h264_nvenc','h264_qsv','h264_amf'].includes(encoder)) throw Error('Encoder tidak didukung.');
+  if (!['libx264','h264_nvenc','h264_qsv','h264_amf'].includes(encoder)) throw Error('Unsupported encoder.');
   return ['-hide_banner','-loglevel','warning','-fflags','+genpts','-i','pipe:0','-map','0:v:0','-map','0:a:0','-c:v',encoder,...(encoder==='libx264'?['-preset','veryfast','-tune','zerolatency']:[]),'-pix_fmt','yuv420p','-r','30','-g','60','-b:v','2500k','-maxrate','2500k','-bufsize','5000k','-c:a','aac','-b:a','128k','-ar','44100','-f','flv',target];
 }
 export function chatBatch(data, seen) {

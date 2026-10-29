@@ -2,32 +2,32 @@ import {spawn} from 'node:child_process';
 
 export function googleClient(document,redirectUri){
   const c=document?.web;
-  if(!c)throw Error('Pilih file JSON client Google berjenis Web application. File akun layanan atau Desktop app tidak cocok.');
-  if(typeof c.client_id!=='string'||!/^[-\w]+\.apps\.googleusercontent\.com$/.test(c.client_id)||typeof c.client_secret!=='string'||!c.client_secret.trim()||c.client_secret.length>500)throw Error('File Google tidak memuat Client ID dan Client Secret yang valid. Unduh ulang dari Google Cloud.');
-  if(!Array.isArray(c.redirect_uris)||!c.redirect_uris.includes(redirectUri))throw Error('Alamat kembali belum cocok. Tambahkan '+redirectUri+' pada Authorized redirect URIs, lalu unduh ulang file JSON.');
+  if(!c)throw Error('Choose a Google Web application client JSON file. Service account and Desktop app files are not supported.');
+  if(typeof c.client_id!=='string'||!/^[-\w]+\.apps\.googleusercontent\.com$/.test(c.client_id)||typeof c.client_secret!=='string'||!c.client_secret.trim()||c.client_secret.length>500)throw Error('The Google file does not contain a valid Client ID and Client Secret. Download it again from Google Cloud.');
+  if(!Array.isArray(c.redirect_uris)||!c.redirect_uris.includes(redirectUri))throw Error('The redirect URI does not match. Add '+redirectUri+' to Authorized redirect URIs, then download the JSON file again.');
   return {clientId:c.client_id,clientSecret:c.client_secret};
 }
 
 export function googleError(error){
   const s=String(error?.message||error);
-  if(/access_denied|Izin YouTube/.test(s))return 'Login dibatalkan atau izin YouTube belum diberikan. Coba lagi dan izinkan akses YouTube. Jika aplikasi masih Testing, tambahkan Gmail kamu sebagai test user di Google Cloud.';
-  if(/redirect_uri_mismatch/.test(s))return 'Alamat kembali tidak cocok. Samakan Authorized redirect URIs di Google Cloud dengan alamat yang ditampilkan di Aktivasi Google.';
-  if(/invalid_client|deleted_client/.test(s))return 'Konfigurasi aplikasi Google ditolak. Unduh file JSON client terbaru lalu impor melalui Aktivasi Google.';
-  if(/accessNotConfigured|SERVICE_DISABLED|has not been used|is disabled/.test(s))return 'Aktifkan YouTube Data API v3 pada project Google Cloud aplikasi ini, lalu login lagi.';
-  if(/invalid_grant/.test(s))return 'Sesi Google kedaluwarsa atau sudah dipakai. Klik Login dengan Google lagi.';
-  if(/fetch failed|timeout|aborted/i.test(s))return 'Koneksi ke Google gagal atau terlalu lama. Periksa internet lalu coba lagi.';
+  if(/access_denied|YouTube access/.test(s))return 'Sign-in was canceled or YouTube access was not granted. Try again and allow YouTube access. If the app is in Testing, add your Google account as a test user in Google Cloud.';
+  if(/redirect_uri_mismatch/.test(s))return 'The redirect URI does not match. Set Authorized redirect URIs in Google Cloud to the address shown in Google setup.';
+  if(/invalid_client|deleted_client/.test(s))return 'The Google app configuration was rejected. Download the latest client JSON and import it through Google setup.';
+  if(/accessNotConfigured|SERVICE_DISABLED|has not been used|is disabled/.test(s))return 'Enable YouTube Data API v3 in this app\'s Google Cloud project, then sign in again.';
+  if(/invalid_grant/.test(s))return 'The Google session has expired or was already used. Click Sign in with Google again.';
+  if(/fetch failed|timeout|aborted/i.test(s))return 'The connection to Google failed or timed out. Check your internet connection and try again.';
   return s.slice(0,450);
 }
 
 const escape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export function loginPage(ok,message){
-  return '<!doctype html><html lang="id"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Login YouTube · Nara</title><link rel="stylesheet" href="/style.css"><body class="loginResult"><main class="card"><div class="eyebrow">NARA / YOUTUBE</div><h1>'+ (ok?'YouTube terhubung':'Login belum selesai')+'</h1><p>'+escape(message)+'</p><p>Kamu dapat menutup tab ini dan kembali ke studio yang sudah terbuka.</p><a href="/">Buka studio →</a></main></body></html>';
+  return '<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>YouTube sign-in · Nara</title><link rel="stylesheet" href="/style.css"><body class="loginResult"><main class="card"><div class="eyebrow">NARA / YOUTUBE</div><h1>'+ (ok?'YouTube connected':'Sign-in incomplete')+'</h1><p>'+escape(message)+'</p><p>You can close this tab and return to your open studio.</p><a href="/">Open studio →</a></main></body></html>';
 }
 
 // Only server-generated Google authorization URLs are accepted. Never invoke a shell with user input.
 export async function openGoogleBrowser(url){
   const u=new URL(url);
-  if(u.origin!=='https://accounts.google.com'||u.pathname!=='/o/oauth2/v2/auth')throw Error('Alamat login tidak valid.');
+  if(u.origin!=='https://accounts.google.com'||u.pathname!=='/o/oauth2/v2/auth')throw Error('Invalid sign-in URL.');
   if(process.platform!=='win32')return false;
   const command="Start-Process -FilePath $env:NARA_GOOGLE_LOGIN_URL";
   return new Promise(resolve=>{
