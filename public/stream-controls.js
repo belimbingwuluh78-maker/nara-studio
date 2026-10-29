@@ -10,18 +10,18 @@ export function renderPlatform(s,recording){
  for(const id of ['connectBtn','googleSetupBtn','broadcastBtn','goLiveBtn','endBtn'])$(id).hidden=manual;
  $('streamSettingsBtn').disabled=s.encoder!=='idle'||recording;
  $('platformLogo').textContent=p.icon;$('platformLogo').dataset.platform=s.platform;
- if(!recording)$('sendBtn').textContent='Kirim ke '+platformName(s.platform)+' ↗';
+ if(!recording)$('sendBtn').textContent='Send to '+platformName(s.platform)+' ↗';
  const supported=['youtube','twitch','tiktok'].includes(s.platform),info=s.chatInfo;
  const active=info?.platform===s.platform?info:null,phase=active?.status||'idle';
  $('chatBtn').disabled=!supported;$('quickChat').disabled=!supported;$('chatBadge').dataset.state=phase;$('chatConnectionStatus').dataset.state=phase;
- $('chatBtn').textContent=['connecting','waiting'].includes(phase)?'Batalkan koneksi':s.chat?'Putus chat':'Hubungkan chat';
- $('chatBadge').textContent=phase==='connecting'?'Menghubungkan…':phase==='waiting'?'Periksa browser':s.chat?'Membaca '+name:supported?'Terputus':'Chat belum tersedia';
- $('chatConnectionStatus').textContent=active?.message||(supported?(s.platform==='youtube'?'Pilih siaran lalu hubungkan chat.':`Hubungkan username ${name} untuk membaca komentar${s.platform==='tiktok'?' (eksperimental)':''}.`):'Konektor chat untuk platform ini belum tersedia.');
- $('chatHelp')?.replaceChildren(document.createTextNode(supported?`Komentar ${name} muncul setelah chat tersambung. Aktifkan Balas otomatis untuk jawaban suara avatar.`:`Komentar ${name} belum terhubung; gunakan simulasi untuk mencoba AI.`));
+ $('chatBtn').textContent=['connecting','waiting'].includes(phase)?'Cancel connection':s.chat?'Disconnect chat':'Connect chat';
+ $('chatBadge').textContent=phase==='connecting'?'Connecting…':phase==='waiting'?'Check browser':s.chat?'Reading '+name:supported?'Disconnected':'Chat unavailable';
+ $('chatConnectionStatus').textContent=active?.message||(supported?(s.platform==='youtube'?'Select a broadcast, then connect chat.':`Connect a ${name} username to read comments${s.platform==='tiktok'?' (experimental)':''}.`):'A chat connector for this platform is not available yet.');
+ $('chatHelp')?.replaceChildren(document.createTextNode(supported?`${name} comments appear after chat connects. Enable Auto-reply for spoken avatar replies.`:`${name} chat is not connected; try the AI with a simulated comment.`));
  $('broadcastBtn').disabled=!s.youtubeReady;
  $('goLiveBtn').disabled=!s.broadcast;$('endBtn').disabled=!s.broadcast;
- $('youtubeStatus').textContent=manual?(s.streamReady?`Tujuan ${name} tersimpan · belum berarti siaran sudah live.`:s.platform==='custom'?'Masukkan Server URL dan Stream Key dari penyedia siaranmu.':`Masukkan Server URL dan Stream Key dari akun ${name} kamu.`):
- s.broadcast?`${s.broadcast.title} · ${s.broadcast.privacy} · ${s.broadcast.status}${s.broadcast.autoStart?' · AUTO-START AKTIF':''}`:
- s.streamReady?'Tujuan manual tersimpan · verifikasi siaran di YouTube.':s.youtubeReady?'Terhubung: '+s.channel+' · Pilih siaran untuk melanjutkan.':s.googleLoginConfigured?'Siap login. Pilih akun Google pemilik channel YouTube.':'Aktivasi Google diperlukan untuk login. Stream key manual juga tersedia.';
+ $('youtubeStatus').textContent=manual?(s.streamReady?`${name} destination saved · this does not mean the broadcast is live.`:s.platform==='custom'?'Enter the server URL and stream key from your streaming provider.':`Enter the server URL and stream key from your ${name} account.`):
+ s.broadcast?`${s.broadcast.title} · ${s.broadcast.privacy} · ${s.broadcast.status}${s.broadcast.autoStart?' · AUTO-START ENABLED':''}`:
+ s.streamReady?'Manual destination saved · check the broadcast on YouTube.':s.youtubeReady?'Connected: '+s.channel+' · Select a broadcast to continue.':s.googleLoginConfigured?'Ready to sign in. Choose the Google account that owns your YouTube channel.':'Set up Google to sign in. You can also use a stream key manually.';
 }
 
