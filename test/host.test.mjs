@@ -11,5 +11,5 @@ test('portrait PNG remains inside broadcast frame at extreme sizes and positions
  for(const x of [0,50,100])for(const y of [0,100]){const r=avatarRect(300,2000,{size:160,x,y});assert.ok(r.x>=0&&r.y>=0);assert.ok(r.x+r.w<=1280&&r.y+r.h<=660);}
 });
 test('voice settings reject invalid device and out-of-range generation controls',()=>{
- assert.throws(()=>voiceSettings({device:'shell'}));assert.throws(()=>voiceSettings({steps:10000}));assert.throws(()=>voiceSettings({speed:'invalid'}));assert.equal(voiceSettings({provider:'omnivoice',mode:'clone'}).mode,'clone');
+ assert.equal(voiceSettings().language,'en');assert.equal(voiceSettings({language:'id'}).language,'id');assert.throws(()=>voiceSettings({device:'shell'}));assert.throws(()=>voiceSettings({steps:10000}));assert.throws(()=>voiceSettings({speed:'invalid'}));assert.equal(voiceSettings({provider:'omnivoice',mode:'clone'}).mode,'clone');
 });

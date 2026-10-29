@@ -34,8 +34,8 @@ test('Google setup persists; OAuth validates state, denial, API failure and chan
   assert.equal((await callback(url,{state:'wrong',code:'ok'})).status,400);
   let result=await callback(url,{error:'access_denied'});assert.equal(result.status,400);assert.match(await result.text(),/test user/);
   assert.equal((await callback(url,{code:'ok'})).status,400);assert.equal((await status()).youtubeReady,false);
-  url=await auth();result=await callback(url,{code:'no-channel'});assert.equal(result.status,400);assert.match(await result.text(),/belum memiliki channel/);assert.equal((await status()).youtubeReady,false);
-  url=await auth();result=await callback(url,{code:'api-disabled'});assert.equal(result.status,400);assert.match(await result.text(),/Aktifkan YouTube Data API/);assert.equal((await status()).youtubeReady,false);
+  url=await auth();result=await callback(url,{code:'no-channel'});assert.equal(result.status,400);assert.match(await result.text(),/does not have a YouTube channel/);assert.equal((await status()).youtubeReady,false);
+  url=await auth();result=await callback(url,{code:'api-disabled'});assert.equal(result.status,400);assert.match(await result.text(),/Enable YouTube Data API/);assert.equal((await status()).youtubeReady,false);
   url=await auth();result=await callback(url,{code:'ok'});assert.equal(result.status,200);assert.match(await result.text(),/Test &lt;channel&gt;/);assert.equal((await status()).youtubeReady,true);
   assert.equal((await callback(url,{code:'ok'})).status,400);
  }finally{if(proc)await stop();await rm(data,{recursive:true,force:true});}

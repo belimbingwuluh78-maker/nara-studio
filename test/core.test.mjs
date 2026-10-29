@@ -12,7 +12,7 @@ test('rejects invalid ingest schemes and preserves stream key as a single argume
  assert.throws(()=>ingestUrl('rtmps://example.com/live?token=secret','key'));
 });
 test('deduplicates comments across pages, excludes events and honors platform polling interval',()=>{
- const seen=new Set();const x={id:'1',snippet:{type:'textMessageEvent',displayMessage:'Halo'},authorDetails:{displayName:'Viewer'}};
+ const seen=new Set();const x={id:'1',snippet:{type:'textMessageEvent',displayMessage:'Hello'},authorDetails:{displayName:'Viewer'}};
  const a=chatBatch({items:[x,{id:'2',snippet:{type:'chatEndedEvent'}}],pollingIntervalMillis:12000,nextPageToken:'next'},seen);
  assert.equal(a.rows.length,1);assert.equal(a.wait,12000);assert.equal(a.next,'next');
  assert.equal(chatBatch({items:[x]},seen).rows.length,0);

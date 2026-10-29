@@ -87,7 +87,7 @@ test('server protects mutations, isolates streaming platforms and generates loca
   }finally{const closed=once(ws,'close');ws.close();await closed;}
  });
  if(process.platform==='win32'){
- const voice=await post('voice',{text:'Halo, saya Nara.'});const buf=Buffer.from(await voice.arrayBuffer());assert.equal(voice.status,200,buf.toString());assert.equal(buf.subarray(0,4).toString(),'RIFF');assert.ok(buf.length>1000);
+ const voice=await post('voice',{text:'Hello, I am Nara.'});const buf=Buffer.from(await voice.arrayBuffer());assert.equal(voice.status,200,buf.toString());assert.equal(buf.subarray(0,4).toString(),'RIFF');assert.ok(buf.length>1000);
  }
  }finally{proc.kill();await rm(data,{recursive:true,force:true});}
 });

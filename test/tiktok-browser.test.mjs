@@ -11,10 +11,10 @@ test('browser DOM reader ignores initial history and extracts only new comment p
  const {dom,read,doc}=fixture(comment('Alice','Riwayat','1'));
  try{
   assert.equal(read().status,'connected');assert.equal(read().rows.length,0);
-  doc.body.insertAdjacentHTML('beforeend',comment('Bob','Halo Nara!','2'));
-  const row=read().rows[0];assert.equal(row.author,'Bob');assert.equal(row.text,'Halo Nara!');assert.equal(row.id,'2');
+  doc.body.insertAdjacentHTML('beforeend',comment('Bob','Hello Nara!','2'));
+  const row=read().rows[0];assert.equal(row.author,'Bob');assert.equal(row.text,'Hello Nara!');assert.equal(row.id,'2');
   assert.equal(read().rows.length,0);
-  doc.body.innerHTML=comment('Bob','Halo Nara!','2');assert.equal(read().rows.length,0);
+  doc.body.innerHTML=comment('Bob','Hello Nara!','2');assert.equal(read().rows.length,0);
   doc.body.insertAdjacentHTML('beforeend',`<section data-e2e="enter-message">${comment('New viewer','joined')}</section><section hidden>${comment('Hidden','ignore')}</section><div><a href="/@user">Profile</a><p>not chat</p></div>`);
   assert.equal(read().rows.length,0);
   doc.body.insertAdjacentHTML('beforeend',comment('Charlie','LIVE has ended','3'));
@@ -36,7 +36,7 @@ test('browser reader pauses for login/CAPTCHA, rejects other rooms and never rea
 
 test('local browser lifecycle uses visible Edge, mutes playback and closes its own browser; no key or signing provider',async()=>{
  const events=[],launches=[],urls=[];let reads=0;
- class Page extends EventEmitter{async goto(url){urls.push(url);}async evaluate(){reads++;return reads===1?{status:'waiting',reason:'login',rows:[]}:{status:'connected',rows:reads===2?[{id:'1',author:'A',text:'Halo'}]:[]};}}
+ class Page extends EventEmitter{async goto(url){urls.push(url);}async evaluate(){reads++;return reads===1?{status:'waiting',reason:'login',rows:[]}:{status:'connected',rows:reads===2?[{id:'1',author:'A',text:'Hello'}]:[]};}}
  const page=new Page();class Browser extends EventEmitter{async newContext(options){this.contextOptions=options;return {newPage:async()=>page};}async close(){this.closed=true;this.emit('disconnected');}}
  const browser=new Browser(),chromium={launch:async options=>{launches.push(options);return browser;}};
  const reader=createTikTokBrowserReader('channel',e=>events.push(e),{loadChromium:async()=>chromium,intervalMs:5});
