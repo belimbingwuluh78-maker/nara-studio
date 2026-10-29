@@ -1,0 +1,30 @@
+NARA STUDIO — START HERE
+
+1. Extract the entire ZIP into one folder on a Windows computer.
+2. Install Node.js 22 or newer and Microsoft Edge or Google Chrome.
+3. Double-click start-studio.cmd. The first run needs internet to download dependencies and FFmpeg.
+4. Open http://localhost:3210 in Chrome or Edge. Leave the server terminal running.
+5. Open Settings to enter your AI API key, then Avatar & voice to choose your character and voice.
+
+TIKTOK WITHOUT EULER
+Select TikTok > Connect chat > enter the username of an account that is LIVE.
+The reader browser opens automatically. Complete any sign-in or CAPTCHA yourself in that window.
+Enable Auto-reply after chat is connected and the AI is ready.
+The TikTok reader is experimental; real viewer comments have not been fully verified.
+A stream key is still required to send video/audio to TikTok. A username is only used to read chat.
+
+OMNIVOICE SPEECH (OPTIONAL)
+You can start with Windows speech.
+For OmniVoice, install uv and run setup-omnivoice.ps1 as described in README.md.
+Python/PyTorch and model setup require several GB of downloads and sufficient RAM/VRAM.
+The default AI persona and voice language are English. Existing saved voice preferences are preserved.
+
+PACKAGE CONTENTS
+Application source, interface, tests, package-lock.json, startup/setup scripts, documentation, and licenses.
+This is not an offline portable application: Node.js, a browser, npm dependencies, and optional Python/models must be available on the target computer.
+Credentials, stream keys, cookies/sign-in sessions, private avatar data, voice references, node_modules, .venv, and model caches are excluded.
+
+TESTING STATUS
+Local automated checks cover API, chat, speech, and encoding behavior. See GitHub Actions for the latest published result.
+Public streaming and the real TikTok viewer > paid AI > avatar speech flow have not been fully tested.
+Read README.md and docs/USER-GUIDE.md for setup, privacy, and alpha limitations.
