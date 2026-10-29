@@ -58,7 +58,7 @@ OmniVoice supports a separate output language setting: English by default, with 
 
 ### Install OmniVoice
 
-Install [uv](https://docs.astral.sh/uv/getting-started/installation/), then run `setup-omnivoice.ps1` from PowerShell in the project folder. The script creates an isolated Python 3.11 environment in `.venv` and installs PyTorch 2.8/CUDA 12.8 and OmniVoice 0.2.1. The system Python installation is not changed.
+Install [uv](https://docs.astral.sh/uv/getting-started/installation/), then run `setup-omnivoice.ps1` from PowerShell in the project folder. The script creates an isolated Python 3.11 environment in `.venv` and installs PyTorch 2.8/CUDA 12.8 and OmniVoice 0.2.1. The system Python installation is not changed. For laptops without an NVIDIA GPU, run `.\setup-omnivoice.ps1 -Device cpu` to install the CPU version instead.
 
 Downloads require several GB. The `k2-fsa/OmniVoice` model is downloaded on first load to `.runtime/models`.
 
