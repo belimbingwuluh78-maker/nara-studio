@@ -1,0 +1,44 @@
+# Dependencies and local runtimes
+node_modules/
+.venv/
+venv/
+.runtime/
+__pycache__/
+*.py[cod]
+
+# Secrets and personal state
+.env
+.env.*
+!.env.example
+.npmrc
+data/
+*.pem
+*.key
+client_secret*.json
+google-client.json
+storage-state*.json
+auth-state*.json
+browser-profile/
+
+# Local output
+recordings/
+logs/
+*.log
+coverage/
+test-results/
+playwright-report/
+*.zip
+*.wav
+*.mp3
+*.mp4
+*.webm
+*.safetensors
+*.pt
+*.pth
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+Desktop.ini

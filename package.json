@@ -1,0 +1,33 @@
+{
+  "name": "ai-live-studio",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node --test test/*.test.mjs",
+    "check": "node --check server.mjs && node --check voice-engine.mjs && node --check public/app.js && node --check public/host-controls.js && node --check google-login.mjs && node --check public/stream-controls.js && node --check public/stream-platforms.js && node --check chat-protocol.mjs && node --check chat-connectors.mjs && node --check live-chat.mjs && node --check chat-worker.mjs && node --check tiktok-browser.mjs && node --check tiktok-dom.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "ffmpeg-static": "^5.2.0",
+    "playwright-core": "1.56.1",
+    "ws": "^8.18.3"
+  },
+  "devDependencies": {
+    "jsdom": "26.1.0"
+  },
+  "description": "Local AI livestream studio with avatars, voice and streaming chat",
+  "license": "MIT",
+  "keywords": [
+    "livestream",
+    "avatar",
+    "ai",
+    "localhost",
+    "twitch",
+    "tiktok"
+  ]
+}
