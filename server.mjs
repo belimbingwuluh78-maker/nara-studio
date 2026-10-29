@@ -31,7 +31,7 @@ let voiceConfig=voiceSettings();
 try{voiceConfig=voiceSettings(JSON.parse(await readFile(dataDir+'voice.json','utf8')));}catch{}
 const fail=(res,e)=>res.status(400).json({error:e.message||'Operation failed.'});
 app.use((req,res,next)=>{
-  if(![`localhost:${port}`,`127.0.0.1:${port}`].includes(req.headers.host)) return res.sendStatus(403);
+  if(![`localhost:${port}`].includes(req.headers.host)) return res.sendStatus(403);
   res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','no-referrer');
   if(req.path.startsWith('/api/')||req.path==='/oauth/callback')res.setHeader('Cache-Control','no-store');
   res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' blob: data:; media-src 'self' blob:; connect-src 'self' ws://localhost:"+port+"; frame-ancestors 'none'");
@@ -211,7 +211,7 @@ app.post('/api/ai/reply',async(req,res)=>{
     res.json({text:answer.slice(0,1200),usage:d.usage||null});
   }catch(e){fail(res,e);}finally{clearTimeout(timeout);aiBusy=false;aiAbort=null;}
 });
-app.post('/api/ai/pause',(req,res)=>{aiAbort?.abort();voiceProcess?.kill();if(omni.pending)omni.stop();res.json({ok:true});});
+app.post('/api/ai/pause',(req,res)=>{aiAbort?.abort();voiceProcess?.kill();if(omni.pending)omni.cancel();res.json({ok:true});});
 app.post('/api/voice',async(req,res)=>{
   if(voiceConfig.provider==='omnivoice'){
     try{const text=String(req.body.text||'').trim().slice(0,1200);if(!text)throw Error('The speech text is empty.');const audio=await omni.request(voiceConfig,text);res.type('audio/wav').send(audio);}catch(e){fail(res,e);}return;
@@ -219,7 +219,7 @@ app.post('/api/voice',async(req,res)=>{
   if(process.platform!=='win32') return fail(res,Error('Local system speech in this version requires Windows.'));
   if(voiceProcess) return fail(res,Error('Speech is still being processed.'));
   const text=String(req.body.text||'').slice(0,1200);
-  const script=`Add-Type -AssemblyName System.Speech; $s=New-Object System.Speech.Synthesis.SpeechSynthesizer; $v=$s.GetInstalledVoices() | Where-Object {$_.VoiceInfo.Culture.TwoLetterISOLanguageName -eq 'en'} | Select-Object -First 1; if($v){$s.SelectVoice($v.VoiceInfo.Name)}; $m=New-Object System.IO.MemoryStream; $s.SetOutputToWaveStream($m); $t=[Console]::In.ReadToEnd(); $s.Speak($t); $s.SetOutputToNull(); [Console]::Out.Write([Convert]::ToBase64String($m.ToArray())); $s.Dispose(); $m.Dispose()`;
+  const script=`[Console]::InputEncoding=[Text.Encoding]::UTF8; Add-Type -AssemblyName System.Speech; $s=New-Object System.Speech.Synthesis.SpeechSynthesizer; $v=$s.GetInstalledVoices() | Where-Object {$_.VoiceInfo.Culture.TwoLetterISOLanguageName -eq 'en'} | Select-Object -First 1; if($v){$s.SelectVoice($v.VoiceInfo.Name)}; $m=New-Object System.IO.MemoryStream; $s.SetOutputToWaveStream($m); $t=[Console]::In.ReadToEnd(); $s.Speak($t); $s.SetOutputToNull(); [Console]::Out.Write([Convert]::ToBase64String($m.ToArray())); $s.Dispose(); $m.Dispose()`;
   const child=spawn('powershell.exe',['-NoProfile','-NonInteractive','-EncodedCommand',Buffer.from(script,'utf16le').toString('base64')],{windowsHide:true,stdio:['pipe','pipe','pipe']});voiceProcess=child;let output='';
   child.stdout.on('data',c=>output+=c);child.stderr.resume();const timer=setTimeout(()=>child.kill(),30000);
   child.on('error',()=>{clearTimeout(timer);voiceProcess=null;if(!res.headersSent)fail(res,Error('The Windows speech engine is unavailable.'));});
@@ -252,6 +252,6 @@ wss.on('connection',ws=>{
 app.post('/api/stream/stop',(req,res)=>{relay?.close();encoder?.stdin.end();res.json({ok:true});});
 app.use(express.static(fileURLToPath(new URL('./public',import.meta.url))));
 app.use((err,req,res,next)=>{if(!res.headersSent)res.status(400).json({error:'Invalid request.'});});
-server.listen(port,'127.0.0.1',()=>console.log(`AI Live Studio: ${origin}`));
+server.listen(port,'127.0.0.1',()=>console.log(`Nara Studio: ${origin}`));
 async function shutdown(){const chatClosed=stopChat();aiAbort?.abort();voiceProcess?.kill();omni.stop();encoder?.kill();server.close();await chatClosed;process.exit();}
 process.on('SIGINT',shutdown);process.on('SIGTERM',shutdown);

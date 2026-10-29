@@ -14,9 +14,9 @@ export function createTikTokBrowserReader(channel,send,{loadChromium=async()=> (
  const close=async()=>{if(closed)return;closed=true;clearInterval(timer);if(launching)await launching.catch(()=>{});await browser?.close().catch(()=>{});};
  const start=(async()=>{
   const chromium=await loadChromium();
-  for(const channel of ['msedge','chrome']){
+  for(const browserChannel of ['msedge','chrome']){
    if(closed)return;
-   try{launching=chromium.launch({channel,headless:false,timeout:20000,args:['--mute-audio']});browser=await launching;break;}catch{}finally{launching=null;}
+   try{launching=chromium.launch({channel:browserChannel,headless:false,timeout:20000,args:['--mute-audio']});browser=await launching;break;}catch{}finally{launching=null;}
   }
   if(!browser){emit({type:'error',message:'The reader browser could not open. Make sure Microsoft Edge or Google Chrome is installed and allowed to run.'});return;}
   if(closed){await browser.close();return;}

@@ -55,6 +55,8 @@ Windows speech is available without downloading an AI voice model. For OmniVoice
 2. Run `setup-omnivoice.ps1` from PowerShell.
 3. Open **Avatar & voice**, select OmniVoice, and load the model.
 
+For laptops without an NVIDIA GPU, run `.\setup-omnivoice.ps1 -Device cpu`.
+
 Python, PyTorch, and model downloads require several GB of storage. CPU/GPU resource requirements depend on the selected settings and concurrent game workload. Model weights and runtimes are not included in this repository.
 
 Custom PNG avatars support idle, talking, and optional blink images, plus size/position controls. Live2D/VRM rigging and automatic game-screen understanding are not implemented.
